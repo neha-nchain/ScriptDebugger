@@ -12,7 +12,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import model.Context;
 import model.StackItem;
-import model.StackItems;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.UnsafeByteArrayOutputStream;
@@ -28,7 +27,6 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -93,7 +91,7 @@ public class InteractiveScriptAppController implements Initializable {
                 createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true);
                 stacksize = stacksize + 1;
             }
-            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + stackItem.getData().toString(),false);
+            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + Utils.HEX.encode(stackItem.getData()).toString(),false);
             stacksize = stacksize + 1;
         }
         createLabel(stacksize, "Script status: " + Context.getInstance().isScriptStatus(),true);
