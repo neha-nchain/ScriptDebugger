@@ -56,27 +56,26 @@
     <GridPane
             fx:id="gridPaneStack" hgap="10" vgap="10">
 
-<!--    <padding><Insets top="40" right="0" bottom="40" left="0"/></padding>
+        <padding><Insets top="40" right="10" bottom="40" left="0"/></padding>
         <columnConstraints>
-            <ColumnConstraints minWidth="50" prefWidth="50"
+            <ColumnConstraints minWidth="50" prefWidth="100"
                                maxWidth="Infinity" halignment="RIGHT">
             </ColumnConstraints>
-            <ColumnConstraints minWidth="50" prefWidth="50"
+            <ColumnConstraints minWidth="50" prefWidth="100"
                                maxWidth="Infinity" hgrow="ALWAYS">
             </ColumnConstraints>
-        </columnConstraints>-->
-<!--    <Label fx:id="remainingScriptLabel" GridPane.columnIndex="0"
-           GridPane.rowIndex="3" >
-    </Label>-->
+        </columnConstraints>
+
+
       <!-- Add Header Label -->
-        <Label text="Script stack" GridPane.columnIndex="0"
-               GridPane.rowIndex="0" GridPane.columnSpan="8"
-               GridPane.rowSpan="1" GridPane.halignment="CENTER"  style="-fx-text-fill: blue">
+        <Label text="Script Stack" GridPane.columnIndex="0"
+               GridPane.rowIndex="0" GridPane.columnSpan="4"
+               GridPane.rowSpan="1" GridPane.halignment="LEFT"  style="-fx-text-fill: blue">
             <font>
-                <Font name="System" size="18" ></Font>
+                <Font name="System" size="24" ></Font>
             </font>
             <GridPane.margin>
-                <Insets top="20" right="0" bottom="20" left="0"></Insets>
+                <Insets top="20" right="0" bottom="2" left="0"></Insets>
             </GridPane.margin>
         </Label>
     </GridPane>

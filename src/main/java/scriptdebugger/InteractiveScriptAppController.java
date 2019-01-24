@@ -81,31 +81,32 @@ public class InteractiveScriptAppController implements Initializable {
     public void addStack() {
         gridPaneStack = new GridPane();
         gridPaneStack.getChildren().removeAll();
-        gridPaneStack.setAlignment(Pos.TOP_RIGHT);
+        gridPaneStack.setAlignment(Pos.CENTER_RIGHT);
         gridPaneStack.setHgap(10);
         gridPaneStack.setVgap(10);
-        gridPaneStack.setPadding(new Insets(60,0,20,0));
+        gridPaneStack.setPadding(new Insets(0, 0, 20, 0));
 
-        int stacksize= 0;
-        gridPaneStack.setId("grid_"+stacksize);
-        for(StackItem stackItem : Context.getInstance().getStackItemsList()) {
-                   createLabel(stacksize, "index["+ stackItem.getIndex()+"] "+stackItem.getData().toString());
-              //  for(StackItem stackItem1: stackItem.getStackItems()){
-                 //   remainingScriptLabel = new Label();
-                //    remainingScriptLabel.setId("stack_"+ (stacksize+1));
-                 //   remainingScriptLabel.setText(stackItem.getData().toString());
-                 //   gridPaneStack.add(remainingScriptLabel, 0, (++stacksize));
-               // }
-            stacksize= stacksize+1;
+        int stacksize = 0;
+        gridPaneStack.setId("grid_" + stacksize);
+        for (StackItem stackItem : Context.getInstance().getStackItemsList()) {
+            if(stackItem.getRemainingScript()!=null) {
+                createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true);
+                stacksize = stacksize + 1;
+            }
+            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + stackItem.getData().toString(),false);
+            stacksize = stacksize + 1;
         }
-        createLabel(stacksize, "Script status: "+Context.getInstance().isScriptStatus());
+        createLabel(stacksize, "Script status: " + Context.getInstance().isScriptStatus(),true);
         borderPane.setCenter(gridPaneStack);
     }
 
-    private void createLabel(int stacksize, String data){
+    private void createLabel(int stacksize, String data, boolean style) {
         remainingScriptLabel = new Label();
-        remainingScriptLabel.setId("stack_"+ (stacksize+1));
+        remainingScriptLabel.setId("stack_" + (stacksize + 1));
         remainingScriptLabel.setText(data);
+        if (style) {
+            remainingScriptLabel.setStyle("-fx-font-weight:bold");
+        }
         gridPaneStack.add(remainingScriptLabel, 0, stacksize);
     }
 
