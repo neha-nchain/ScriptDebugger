@@ -138,8 +138,10 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         List<byte[]> stack = getStack();
         if (stack.isEmpty() || !Script.castToBool(stack.get(stack.size() - 1))) {
             System.out.println("Script failed.");
+            model.Context.getInstance().setScriptStatus(false);
         } else {
             System.out.println("Script success.");
+            model.Context.getInstance().setScriptStatus(true);
         }
     }
 

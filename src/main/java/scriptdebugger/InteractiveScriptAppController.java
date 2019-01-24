@@ -65,6 +65,7 @@ public class InteractiveScriptAppController implements Initializable {
     private void debugScript(ActionEvent actionEvent) throws IOException {
 
         Script script = null;
+        Context.getInstance().getStackItemsList().clear();
         LinkedList<byte[]> stack = new LinkedList<byte[]>();
         ScriptStateListener listener = new InteractiveScriptStateListener(true);
 
@@ -79,6 +80,7 @@ public class InteractiveScriptAppController implements Initializable {
     //Display the stack in UI
     public void addStack() {
         gridPaneStack = new GridPane();
+        gridPaneStack.getChildren().removeAll();
         gridPaneStack.setAlignment(Pos.TOP_RIGHT);
         gridPaneStack.setHgap(10);
         gridPaneStack.setVgap(10);
@@ -87,17 +89,24 @@ public class InteractiveScriptAppController implements Initializable {
         int stacksize= 0;
         gridPaneStack.setId("grid_"+stacksize);
         for(StackItem stackItem : Context.getInstance().getStackItemsList()) {
-
-
+                   createLabel(stacksize, stackItem.getData().toString());
               //  for(StackItem stackItem1: stackItem.getStackItems()){
-                    remainingScriptLabel = new Label();
-                    remainingScriptLabel.setId("stack_"+ (stacksize+1));
-                    remainingScriptLabel.setText(stackItem.getData().toString());
-                    gridPaneStack.add(remainingScriptLabel, 0, (++stacksize));
+                 //   remainingScriptLabel = new Label();
+                //    remainingScriptLabel.setId("stack_"+ (stacksize+1));
+                 //   remainingScriptLabel.setText(stackItem.getData().toString());
+                 //   gridPaneStack.add(remainingScriptLabel, 0, (++stacksize));
                // }
-
+            stacksize= stacksize+1;
         }
+        createLabel(stacksize, "Script status: "+Context.getInstance().isScriptStatus());
         borderPane.setCenter(gridPaneStack);
+    }
+
+    private void createLabel(int stacksize, String data){
+        remainingScriptLabel = new Label();
+        remainingScriptLabel.setId("stack_"+ (stacksize+1));
+        remainingScriptLabel.setText(data);
+        gridPaneStack.add(remainingScriptLabel, 0, stacksize);
     }
 
     private Script parseScriptString(String string) throws IOException {
