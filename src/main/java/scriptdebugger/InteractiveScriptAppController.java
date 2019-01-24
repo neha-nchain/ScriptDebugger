@@ -89,7 +89,7 @@ public class InteractiveScriptAppController implements Initializable {
         int stacksize= 0;
         gridPaneStack.setId("grid_"+stacksize);
         for(StackItem stackItem : Context.getInstance().getStackItemsList()) {
-                   createLabel(stacksize, stackItem.getData().toString());
+                   createLabel(stacksize, "index["+ stackItem.getIndex()+"] "+stackItem.getData().toString());
               //  for(StackItem stackItem1: stackItem.getStackItems()){
                  //   remainingScriptLabel = new Label();
                 //    remainingScriptLabel.setId("stack_"+ (stacksize+1));
