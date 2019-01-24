@@ -11,6 +11,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import model.Context;
+import model.StackItem;
 import model.StackItems;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
@@ -82,11 +83,18 @@ public class InteractiveScriptAppController implements Initializable {
         gridPaneStack.setHgap(10);
         gridPaneStack.setVgap(10);
         gridPaneStack.setPadding(new Insets(20,0,20,0));
-        remainingScriptLabel = new Label();
-        remainingScriptLabel.setText(Context.getInstance().getStackItemsList().toString());
-       // gridPaneStack.add(remainingScriptLabel,0, index);
-        borderPane.setLeft(gridPaneStack);
 
+        int stacksize= 0;
+        gridPaneStack.setId("grid_"+stacksize);
+        for(StackItems stackItem : Context.getInstance().getStackItemsList()) {
+
+            remainingScriptLabel = new Label();
+            remainingScriptLabel.setId("stack_"+stacksize);
+            remainingScriptLabel.setText(stackItem.getStackItems().toString());
+            gridPaneStack.add(remainingScriptLabel, 0, stacksize++);
+
+        }
+        borderPane.setRight(gridPaneStack);
     }
 
     private Script parseScriptString(String string) throws IOException {
