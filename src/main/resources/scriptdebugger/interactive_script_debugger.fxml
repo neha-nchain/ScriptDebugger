@@ -71,7 +71,7 @@
       <!-- Add Header Label -->
         <Label text="Script stack" GridPane.columnIndex="0"
                GridPane.rowIndex="0" GridPane.columnSpan="8"
-               GridPane.rowSpan="1" GridPane.halignment="LEFT"  style="-fx-text-fill: blue">
+               GridPane.rowSpan="1" GridPane.halignment="CENTER"  style="-fx-text-fill: blue">
             <font>
                 <Font name="System" size="18" ></Font>
             </font>
@@ -79,8 +79,6 @@
                 <Insets top="20" right="0" bottom="20" left="0"></Insets>
             </GridPane.margin>
         </Label>
-        <Label fx:id="remainingScriptLabel" GridPane.columnIndex="0"
-               GridPane.rowIndex="3" ></Label>
     </GridPane>
     </right>
 </BorderPane>
