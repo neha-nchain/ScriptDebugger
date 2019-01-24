@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import model.Context;
 import model.StackItems;
@@ -38,7 +39,8 @@ public class InteractiveScriptAppController implements Initializable {
 
     @FXML
     public GridPane gridPane;
-
+    @FXML
+    public static BorderPane borderPane;
     @FXML
     public GridPane gridPaneStack;
     @FXML
@@ -69,12 +71,12 @@ public class InteractiveScriptAppController implements Initializable {
         script = parseScriptString(tbScriptSig.getText());
         Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
 
-        addStack(Context.getInstance().getStackItemsList());
+        addStack();
 
     }
 
-    //Display the stacin UI
-    public void addStack(List stackItems) {
+    //Display the stack in UI
+    public void addStack() {
         gridPaneStack = new GridPane();
         gridPaneStack.setAlignment(Pos.TOP_RIGHT);
         gridPaneStack.setHgap(10);
@@ -82,8 +84,8 @@ public class InteractiveScriptAppController implements Initializable {
         gridPaneStack.setPadding(new Insets(20,0,20,0));
         remainingScriptLabel = new Label();
         remainingScriptLabel.setText(Context.getInstance().getStackItemsList().toString());
-        ///gridPaneStack.add(remainingScriptLabel,0, index);
-       // borderPane.setLeft(gridPaneStack);
+       // gridPaneStack.add(remainingScriptLabel,0, index);
+        borderPane.setLeft(gridPaneStack);
 
     }
 

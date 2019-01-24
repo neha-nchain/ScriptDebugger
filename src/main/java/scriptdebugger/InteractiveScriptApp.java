@@ -17,11 +17,13 @@ import model.Context;
 
 import java.util.List;
 
+import static scriptdebugger.InteractiveScriptAppController.borderPane;
+
 public class InteractiveScriptApp extends Application {
 
     private static final String APP_NAME = "Interactive Script Debugger";
     private static InteractiveScriptApp instance;
-    private static BorderPane borderPane;
+   // private static BorderPane borderPane;
     private Stage scriptWindow;
     private InteractiveScriptAppController controller;
     private TableView tableview;
