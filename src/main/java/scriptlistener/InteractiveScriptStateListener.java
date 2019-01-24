@@ -92,6 +92,8 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
             int index = 0;
             for (byte[] bytes : reverseStack) {
                 stack = stack + " " + (index++) + " " + bytes + "\n";
+
+                //print the HEX to debugger
                 System.out.println(String.format("Stack index[%s] length[%s] [%s]", index, bytes.length, (bytes)));
                 stackItems.add(stack);
                 app.addStack(index, stack, stackItems);
