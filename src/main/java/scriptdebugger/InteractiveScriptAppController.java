@@ -2,10 +2,15 @@ package scriptdebugger;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import model.Context;
+import model.StackItems;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.UnsafeByteArrayOutputStream;
@@ -18,15 +23,19 @@ import scriptlistener.InteractiveScriptStateListener;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ResourceBundle;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.bitcoinj.core.Utils.HEX;
 import static org.bitcoinj.script.ScriptOpCodes.*;
 
-public class InteractiveScriptAppController {
-/*
+
+public class InteractiveScriptAppController implements Initializable {
+
     @FXML
     public GridPane gridPane;
 
@@ -38,11 +47,16 @@ public class InteractiveScriptAppController {
     public Label stackLabel;
     @FXML
     public Button debugBtn;
-*/
+
 
     @FXML
     public TextField tbScriptSig;
 
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        Context.getInstance().getStackItemsList();
+    }
 
     @FXML
     private void debugScript(ActionEvent actionEvent) throws IOException {
@@ -55,9 +69,23 @@ public class InteractiveScriptAppController {
         script = parseScriptString(tbScriptSig.getText());
         Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
 
+        addStack(Context.getInstance().getStackItemsList());
+
     }
 
+    //Display the stacin UI
+    public void addStack(List stackItems) {
+        gridPaneStack = new GridPane();
+        gridPaneStack.setAlignment(Pos.TOP_RIGHT);
+        gridPaneStack.setHgap(10);
+        gridPaneStack.setVgap(10);
+        gridPaneStack.setPadding(new Insets(20,0,20,0));
+        remainingScriptLabel = new Label();
+        remainingScriptLabel.setText(Context.getInstance().getStackItemsList().toString());
+        ///gridPaneStack.add(remainingScriptLabel,0, index);
+       // borderPane.setLeft(gridPaneStack);
 
+    }
 
     private Script parseScriptString(String string) throws IOException {
         String[] words = string.split("[ \\t\\n]");
@@ -104,5 +132,6 @@ public class InteractiveScriptAppController {
         else
             return value - 1 + OP_1;
     }
+
 
 }

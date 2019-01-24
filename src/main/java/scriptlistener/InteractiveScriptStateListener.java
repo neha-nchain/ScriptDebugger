@@ -16,12 +16,12 @@
 package scriptlistener;
 
 import com.google.common.io.BaseEncoding;
+import model.StackItem;
+import model.StackItems;
+import org.bitcoinj.core.Context;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.script.*;
 import scriptdebugger.InteractiveScriptApp;
-import scriptdebugger.InteractiveScriptAppController;
-//import org.spongycastle.util.encoders.Hex;
-//import scriptdebugger.InteractiveScriptAppController;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -29,8 +29,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static org.bitcoinj.core.Utils.HEX;
 
 /**
  * A simple demonstration of ScriptStateListener that dumps the state of the script interpreter to console after each op code execution.
@@ -46,7 +44,8 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
     public InteractiveScriptStateListener(boolean pauseForUser) {
         this.pauseForUser = pauseForUser;
     }
-    List<String> stackItems = new ArrayList<String>();
+    StackItems stackItems = new StackItems();
+    List<StackItem> stackItemList = new ArrayList<StackItem>();
     @Override
     public void onBeforeOpCodeExecuted(boolean willExecute) {
 
@@ -63,14 +62,14 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         ScriptBuilder builder = new ScriptBuilder();
 
         for (ScriptChunk chunk : getScriptChunks().subList(getChunkIndex(), getScriptChunks().size())) {
-            if (chunk.data != null)
+/*            if (chunk.data != null)
                 System.out.println("HEX data " + new BigInteger(chunk.data).intValue());
             else
-                System.out.println("HEX opcode " + ScriptOpCodes.getOpCodeName(chunk.opcode));
+                System.out.println("HEX opcode " + ScriptOpCodes.getOpCodeName(chunk.opcode));*/
             builder.addChunk(chunk);
         }
         System.out.println("chunk " + builder.build());
-        InteractiveScriptApp app = new InteractiveScriptApp();
+
         //  interactiveScriptAppController.addStack(builder.build().toString());
         Script remainScript = builder.build();
         String remainingString = truncateData(remainScript.toString());
@@ -84,7 +83,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         List<byte[]> reverseStack = new ArrayList<byte[]>(getStack());
         Collections.reverse(reverseStack);
         System.out.println("----------------------------------------");
-        System.out.println("Stack:");
+        System.out.println("StackItem:");
         String stack = "";
         if (reverseStack.isEmpty()) {
             System.out.println("empty");
@@ -94,11 +93,15 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
                 stack = stack + " " + (index++) + " " + bytes + "\n";
 
                 //print the HEX to debugger
-                System.out.println(String.format("Stack index[%s] length[%s] [%s]", index, bytes.length, (bytes)));
-                stackItems.add(stack);
-                app.addStack(index, stack, stackItems);
-                // System.out.println(":  " +new String(bytes));
-                // System.out.println(":  " +new BigInteger(bytes).intValue());
+                System.out.println(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, (bytes)));
+
+                StackItem stackItem = new StackItem(index,bytes);
+                stackItemList.add(stackItem);
+                stackItems.setStackItems(stackItemList);
+               // c
+                int size = model.Context.getInstance().getStackItemsList().size();
+                model.Context.getInstance().getStackItemsList().add(stackItems);
+
             }
         }
 
@@ -106,7 +109,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         if (!getAltstack().isEmpty()) {
             reverseStack = new ArrayList<byte[]>(getAltstack());
             Collections.reverse(reverseStack);
-            System.out.println("Alt Stack: ");
+            System.out.println("Alt StackItem: ");
 
             for (byte[] bytes : reverseStack) {
                 System.out.println(HEX.encode(bytes));
@@ -117,7 +120,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         if (!getIfStack().isEmpty()) {
             List<Boolean> reverseIfStack = new ArrayList<Boolean>(getIfStack());
             Collections.reverse(reverseIfStack);
-            System.out.println("If Stack: ");
+            System.out.println("If StackItem: ");
 
             for (Boolean element : reverseIfStack) {
                 System.out.println(element);

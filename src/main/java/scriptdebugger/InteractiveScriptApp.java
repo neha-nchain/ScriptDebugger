@@ -13,6 +13,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import model.Context;
 
 import java.util.List;
 
@@ -54,18 +55,20 @@ public class InteractiveScriptApp extends Application {
         primaryStage.show();
     }
 
-    public void addStack(int index, String textValueForStack, List stackItems) {
+/*
+    public void addStack(List stackItems) {
         gridPaneStack = new GridPane();
         gridPaneStack.setAlignment(Pos.TOP_RIGHT);
         gridPaneStack.setHgap(10);
         gridPaneStack.setVgap(10);
         gridPaneStack.setPadding(new Insets(20,0,20,0));
         remainingScriptLabel = new Label();
-        remainingScriptLabel.setText(textValueForStack);
-        gridPaneStack.add(remainingScriptLabel,0, index);
+        remainingScriptLabel.setText(Context.getInstance().getStackItemsList().toString());
+       ///gridPaneStack.add(remainingScriptLabel,0, index);
         borderPane.setLeft(gridPaneStack);
 
     }
+*/
 
 
 
