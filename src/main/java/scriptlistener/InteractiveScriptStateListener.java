@@ -96,11 +96,9 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
                 System.out.println(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, (bytes)));
 
                 StackItem stackItem = new StackItem(index,bytes);
-                stackItemList.add(stackItem);
-                stackItems.setStackItems(stackItemList);
-               // c
-                int size = model.Context.getInstance().getStackItemsList().size();
-                model.Context.getInstance().getStackItemsList().add(stackItems);
+              //  stackItemList.add(stackItem);
+              //  stackItems.setStackItems(stackItemList);
+                model.Context.getInstance().getStackItemsList().add(stackItem);
 
             }
         }

@@ -69,7 +69,7 @@ public class InteractiveScriptAppController implements Initializable {
         ScriptStateListener listener = new InteractiveScriptStateListener(true);
 
         // script = ScriptBuilder.createScriptFromUIInput(tbScriptSig.getText().split(" "));
-        script = parseScriptString(tbScriptSig.getText());
+        script = parseScriptString(tbScriptSig.getText().toUpperCase());
         Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
 
         addStack();
@@ -82,19 +82,22 @@ public class InteractiveScriptAppController implements Initializable {
         gridPaneStack.setAlignment(Pos.TOP_RIGHT);
         gridPaneStack.setHgap(10);
         gridPaneStack.setVgap(10);
-        gridPaneStack.setPadding(new Insets(20,0,20,0));
+        gridPaneStack.setPadding(new Insets(60,0,20,0));
 
         int stacksize= 0;
         gridPaneStack.setId("grid_"+stacksize);
-        for(StackItems stackItem : Context.getInstance().getStackItemsList()) {
+        for(StackItem stackItem : Context.getInstance().getStackItemsList()) {
 
-            remainingScriptLabel = new Label();
-            remainingScriptLabel.setId("stack_"+stacksize);
-            remainingScriptLabel.setText(stackItem.getStackItems().toString());
-            gridPaneStack.add(remainingScriptLabel, 0, stacksize++);
+
+              //  for(StackItem stackItem1: stackItem.getStackItems()){
+                    remainingScriptLabel = new Label();
+                    remainingScriptLabel.setId("stack_"+ (stacksize+1));
+                    remainingScriptLabel.setText(stackItem.getData().toString());
+                    gridPaneStack.add(remainingScriptLabel, 0, (++stacksize));
+               // }
 
         }
-        borderPane.setRight(gridPaneStack);
+        borderPane.setCenter(gridPaneStack);
     }
 
     private Script parseScriptString(String string) throws IOException {
