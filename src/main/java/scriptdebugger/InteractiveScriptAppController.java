@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -27,6 +28,7 @@ import java.math.BigInteger;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -36,12 +38,14 @@ import static org.bitcoinj.script.ScriptOpCodes.*;
 
 public class InteractiveScriptAppController implements Initializable {
 
-    @FXML
-    public GridPane gridPane;
+//    @FXML
+//    public GridPane gridPane;
     @FXML
     public static BorderPane borderPane;
+//    @FXML
+//    public GridPane gridPaneStack;
     @FXML
-    public GridPane gridPaneStack;
+    public ScrollPane scrollPane;
     @FXML
     public Label remainingScriptLabel;
     @FXML
@@ -65,47 +69,64 @@ public class InteractiveScriptAppController implements Initializable {
         Script script = null;
         Context.getInstance().getStackItemsList().clear();
         LinkedList<byte[]> stack = new LinkedList<byte[]>();
-        ScriptStateListener listener = new InteractiveScriptStateListener(true);
+        InteractiveScriptStateListener listener = new InteractiveScriptStateListener(true);
 
         // script = ScriptBuilder.createScriptFromUIInput(tbScriptSig.getText().split(" "));
         script = parseScriptString(tbScriptSig.getText().toUpperCase());
         Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
 
-        addStack();
+        addStack(listener);
 
     }
 
     //Display the stack in UI
-    public void addStack() {
-        gridPaneStack = new GridPane();
-        gridPaneStack.getChildren().removeAll();
-        gridPaneStack.setAlignment(Pos.CENTER_RIGHT);
-        gridPaneStack.setHgap(10);
-        gridPaneStack.setVgap(10);
-        gridPaneStack.setPadding(new Insets(0, 0, 20, 0));
+    public void addStack(InteractiveScriptStateListener listener) {
 
+//        gridPaneStack.setAlignment(Pos.CENTER_RIGHT);
+//        gridPaneStack.setHgap(10);
+//        gridPaneStack.setVgap(10);
+//        gridPaneStack.setPadding(new Insets(0, 0, 20, 0));
+//        gridPaneStack.setMaxHeight(900);
+
+        GridPane gridPane = new GridPane();
         int stacksize = 0;
-        gridPaneStack.setId("grid_" + stacksize);
-        for (StackItem stackItem : Context.getInstance().getStackItemsList()) {
-            if(stackItem.getRemainingScript()!=null) {
-                createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true);
-                stacksize = stacksize + 1;
-            }
-            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + Utils.HEX.encode(stackItem.getData()).toString(),false);
-            stacksize = stacksize + 1;
+        gridPane.setId("grid_pane" + stacksize);
+
+        List<String> lines = listener.sb;
+        for(int i = 0 ; i < lines.size() ; i++) {
+            createLabel(i, lines.get(i), false, gridPane);
         }
-        createLabel(stacksize, "Script status: " + Context.getInstance().isScriptStatus(),true);
-        borderPane.setCenter(gridPaneStack);
+//
+//        for (StackItem stackItem : Context.getInstance().getStackItemsList()) {
+//            if(stackItem.getRemainingScript()!=null) {
+//                createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true);
+//                stacksize = stacksize + 1;
+//            }
+//            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + Utils.HEX.encode(stackItem.getData()).toString(),false);
+//            stacksize = stacksize + 1;
+//        }
+     //   createLabel(stacksize, "Script status: " + Context.getInstance().isScriptStatus(),true);
+
+//        for (StackItem stackItem : Context.getInstance().getStackItemsList()) {
+//            if(stackItem.getRemainingScript()!=null) {
+//                createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true);
+//                stacksize = stacksize + 1;
+//            }
+//            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + Utils.HEX.encode(stackItem.getData()).toString(),false);
+//            stacksize = stacksize + 1;
+//        }
+//        createLabel(stacksize, "Script status: " + Context.getInstance().isScriptStatus(),true);
+        scrollPane.setContent(gridPane);
     }
 
-    private void createLabel(int stacksize, String data, boolean style) {
+    private void createLabel(int stacksize, String data, boolean style, GridPane gridPane) {
         remainingScriptLabel = new Label();
         remainingScriptLabel.setId("stack_" + (stacksize + 1));
         remainingScriptLabel.setText(data);
         if (style) {
             remainingScriptLabel.setStyle("-fx-font-weight:bold");
         }
-        gridPaneStack.add(remainingScriptLabel, 0, stacksize);
+        gridPane.add(remainingScriptLabel, 0, stacksize);
     }
 
     private Script parseScriptString(String string) throws IOException {
