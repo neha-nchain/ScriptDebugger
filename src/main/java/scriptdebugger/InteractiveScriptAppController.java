@@ -38,14 +38,17 @@ import static org.bitcoinj.script.ScriptOpCodes.*;
 
 public class InteractiveScriptAppController implements Initializable {
 
-//    @FXML
+    //    @FXML
 //    public GridPane gridPane;
     @FXML
     public static BorderPane borderPane;
-//    @FXML
+    //    @FXML
 //    public GridPane gridPaneStack;
     @FXML
-    public ScrollPane scrollPane;
+    public ScrollPane scrollPaneRun;
+
+    @FXML
+    public ScrollPane scrollPaneDebug;
     @FXML
     public Label remainingScriptLabel;
     @FXML
@@ -83,9 +86,10 @@ public class InteractiveScriptAppController implements Initializable {
         script = parseScriptString(tbScriptPub.getText().toUpperCase());
         Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
 
-        addStack(listener);
+        addStackRun(listener);
 
     }
+
     @FXML
     private void debugScript(ActionEvent actionEvent) throws IOException {
 
@@ -101,48 +105,36 @@ public class InteractiveScriptAppController implements Initializable {
         script = parseScriptString(tbScriptPub.getText().toUpperCase());
         Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
 
-        addStack(listener);
+        addStackDebug(listener);
 
     }
 
-    //Display the stack in UI
-    public void addStack(InteractiveScriptStateListener listener) {
-
-//        gridPaneStack.setAlignment(Pos.CENTER_RIGHT);
-//        gridPaneStack.setHgap(10);
-//        gridPaneStack.setVgap(10);
-//        gridPaneStack.setPadding(new Insets(0, 0, 20, 0));
-//        gridPaneStack.setMaxHeight(900);
+    //Display the stack in run UI
+    public void addStackRun(InteractiveScriptStateListener listener) {
 
         GridPane gridPane = new GridPane();
         int stacksize = 0;
         gridPane.setId("grid_pane" + stacksize);
 
         List<String> lines = listener.sb;
-        for(int i = 0 ; i < lines.size() ; i++) {
+        for (int i = 0; i < lines.size(); i++) {
             createLabel(i, lines.get(i), false, gridPane);
         }
-//
-//        for (StackItem stackItem : Context.getInstance().getStackItemsList()) {
-//            if(stackItem.getRemainingScript()!=null) {
-//                createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true);
-//                stacksize = stacksize + 1;
-//            }
-//            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + Utils.HEX.encode(stackItem.getData()).toString(),false);
-//            stacksize = stacksize + 1;
-//        }
-     //   createLabel(stacksize, "Script status: " + Context.getInstance().isScriptStatus(),true);
+        scrollPaneRun.setContent(gridPane);
+    }
 
-//        for (StackItem stackItem : Context.getInstance().getStackItemsList()) {
-//            if(stackItem.getRemainingScript()!=null) {
-//                createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true);
-//                stacksize = stacksize + 1;
-//            }
-//            createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + Utils.HEX.encode(stackItem.getData()).toString(),false);
-//            stacksize = stacksize + 1;
-//        }
-//        createLabel(stacksize, "Script status: " + Context.getInstance().isScriptStatus(),true);
-        scrollPane.setContent(gridPane);
+    //Display the stack in debug UI
+    public void addStackDebug(InteractiveScriptStateListener listener) {
+
+        GridPane gridPane = new GridPane();
+        int stacksize = 0;
+        gridPane.setId("grid_pane_debug" + stacksize);
+
+        List<String> lines = listener.sb;
+        for (int i = 0; i < lines.size(); i++) {
+            createLabel(i, lines.get(i), false, gridPane);
+        }
+        scrollPaneDebug.setContent(gridPane);
     }
 
     private void createLabel(int stacksize, String data, boolean style, GridPane gridPane) {
