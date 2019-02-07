@@ -19,6 +19,7 @@ import com.google.common.io.BaseEncoding;
 import model.StackItem;
 import model.StackItems;
 import org.bitcoinj.core.ScriptException;
+import org.bitcoinj.core.Utils;
 import org.bitcoinj.script.*;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
     }
     StackItems stackItems = new StackItems();
     List<StackItem> stackItemList = new ArrayList<StackItem>();
+
     @Override
     public void onBeforeOpCodeExecuted(boolean willExecute) {
 
@@ -55,59 +57,39 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         }
 
         System.out.println(String.format("\nExecuting %s operation: [%s]", getCurrentChunk().isOpCode() ? "OP_CODE" : "PUSHDATA", ScriptOpCodes.getOpCodeName(getCurrentChunk().opcode)));
-        sb.add(String.format("\nExecuting %s operation: [%s]", getCurrentChunk().isOpCode() ? "OP_CODE" : "PUSHDATA", ScriptOpCodes.getOpCodeName(getCurrentChunk().opcode)));
+       // sb.add(String.format("\nExecuting %s operation: [%s]", getCurrentChunk().isOpCode() ? "OP_CODE" : "PUSHDATA", ScriptOpCodes.getOpCodeName(getCurrentChunk().opcode)));
     }
 
     @Override
     public void onAfterOpCodeExectuted() {
 
         ScriptBuilder builder = new ScriptBuilder();
-
         for (ScriptChunk chunk : getScriptChunks().subList(getChunkIndex(), getScriptChunks().size())) {
-/*            if (chunk.data != null)
-                System.out.println("HEX data " + new BigInteger(chunk.data).intValue());
-            else
-                System.out.println("HEX opcode " + ScriptOpCodes.getOpCodeName(chunk.opcode));*/
+
             builder.addChunk(chunk);
         }
-        System.out.println("chunk " + builder.build());
-
-        sb.add("chunk " + builder.build());
-
-        //  interactiveScriptAppController.addStack(builder.build().toString());
         Script remainScript = builder.build();
         String remainingString = truncateData(remainScript.toString());
         int startIndex = fullScriptString.indexOf(remainingString);
         String markedScriptString = fullScriptString.substring(0, startIndex) + "^" + fullScriptString.substring(startIndex);
-        //System.out.println("Remaining code: " + remainingString);
-        System.out.println("Execution point (^): " + markedScriptString);
-        System.out.println();
-        System.out.println("Remaining script" + remainingString);
         sb.add("Execution point (^): " + markedScriptString);
         sb.add(NEWLINE);
-        sb.add("Remaining script" + remainingString);
-
-        //dump stacks
         List<byte[]> reverseStack = new ArrayList<byte[]>(getStack());
         Collections.reverse(reverseStack);
-        System.out.println("----------------------------------------");
-        System.out.println("StackItem:");
-        sb.add("----------------------------------------");
-        sb.add("StackItem:");
+        sb.add("Stack:");
 
         String stack = "";
         if (reverseStack.isEmpty()) {
             System.out.println("empty");
-            sb.add("empty");
+            sb.add("Empty stack");
         } else {
             int index = 0;
             for (byte[] bytes : reverseStack) {
                 stack = stack + " " + (index++) + " " + bytes + "\n";
 
                 //print the HEX to debugger
-                System.out.println(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, (bytes)));
-                sb.add(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, (bytes)));
-                StackItem stackItem;
+               sb.add(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, Utils.HEX.encode(bytes)));
+               /* StackItem stackItem;
                 if(index==1) {
                     stackItem = new StackItem(index, bytes, remainingString);
                 }else{
@@ -115,7 +97,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
                 }
               //  stackItemList.add(stackItem);
               //  stackItems.setStackItems(stackItemList);
-                model.Context.getInstance().getStackItemsList().add(stackItem);
+                model.Context.getInstance().getStackItemsList().add(stackItem);*/
 
             }
         }
@@ -125,21 +107,20 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
             reverseStack = new ArrayList<byte[]>(getAltstack());
             Collections.reverse(reverseStack);
             System.out.println("Alt StackItem: ");
-            sb.add("Alt StackItem: ");
+            sb.add("Alt Stack: ");
 
             for (byte[] bytes : reverseStack) {
                 System.out.println(HEX.encode(bytes));
                 sb.add(HEX.encode(bytes));
             }
-            System.out.println();
-            sb.add(NEWLINE);
+           sb.add(NEWLINE);
         }
 
         if (!getIfStack().isEmpty()) {
             List<Boolean> reverseIfStack = new ArrayList<Boolean>(getIfStack());
             Collections.reverse(reverseIfStack);
             System.out.println("If StackItem: ");
-            sb.add("If StackItem: ");
+            sb.add("If Stack: ");
 
             for (Boolean element : reverseIfStack) {
                 System.out.println(element);
@@ -147,6 +128,10 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
             }
             System.out.println();
             sb.add(NEWLINE);
+        }
+
+        if (pauseForUser) {
+            System.out.print("Press enter key to continue");
         }
 
     }
@@ -173,7 +158,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
 
     private String truncateData(String scriptString) {
         System.out.println("Lets scriptString " + scriptString);
-        sb.add("Lets scriptString " + scriptString);
+        //sb.add("Lets scriptString " + scriptString);
         Pattern p = Pattern.compile("\\[(.*?)\\]");
         Matcher m = p.matcher(scriptString);
 
@@ -187,7 +172,6 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         }
         m.appendTail(stringBuffer);
         System.out.println("Lets parse " + stringBuffer.toString());
-        sb.add("Lets parse " + stringBuffer.toString());
         return stringBuffer.toString();
     }
 

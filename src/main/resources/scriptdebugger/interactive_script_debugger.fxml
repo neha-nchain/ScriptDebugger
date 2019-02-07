@@ -32,17 +32,37 @@
 
 
             <!-- Add script sig Label -->
-            <Label text="Script : " GridPane.columnIndex="0"
+            <Label text="Script Sig Key: " GridPane.columnIndex="0"
                    GridPane.rowIndex="1" >
             </Label>
             <!-- Add Name Text Field -->
             <TextField fx:id="tbScriptSig" prefHeight="40"
                        GridPane.columnIndex="1" GridPane.rowIndex="1"/>
 
+            <!-- Add script sig Label -->
+            <Label text="Script Pub Key: " GridPane.columnIndex="0"
+                   GridPane.rowIndex="2" >
+            </Label>
+            <!-- Add Name Text Field -->
+            <TextField fx:id="tbScriptPub" prefHeight="40"
+                       GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
             <!-- Add run script Button -->
-            <Button fx:id="debugBtn" text="Run script"
+            <Button fx:id="runBtn" text="Run script"
                     prefWidth="170" prefHeight="20" defaultButton="true"
-                    GridPane.columnIndex="0" GridPane.rowIndex="2"
+                    GridPane.columnIndex="0" GridPane.rowIndex="3"
+                    GridPane.columnSpan="2" GridPane.rowSpan="1"
+                    GridPane.halignment="LEFT"
+                    onAction="#runScript">
+                <GridPane.margin>
+                    <Insets top="20" right="0" bottom="20" left="0"></Insets>
+                </GridPane.margin>
+            </Button>
+
+            <!-- Add debug script Button -->
+            <Button fx:id="debugBtn" text="Debug script"
+                    prefWidth="170" prefHeight="20" defaultButton="true"
+                    GridPane.columnIndex="0" GridPane.rowIndex="4"
                     GridPane.columnSpan="2" GridPane.rowSpan="1"
                     GridPane.halignment="LEFT"
                     onAction="#debugScript">
@@ -78,7 +98,11 @@
 
         <ScrollPane fx:id="scrollPane" GridPane.columnIndex="0" prefHeight="500"
                     GridPane.rowIndex="1" GridPane.columnSpan="1"
-                    GridPane.rowSpan="1" GridPane.halignment="LEFT"></ScrollPane>
+                    GridPane.rowSpan="1" GridPane.halignment="CENTER"></ScrollPane>
+
+      <ScrollPane fx:id="scrollPaneDebug" GridPane.columnIndex="1" prefHeight="500"
+                    GridPane.rowIndex="1" GridPane.columnSpan="1"
+                    GridPane.rowSpan="2" GridPane.halignment="LEFT"></ScrollPane>
 
     </GridPane>
     </right>

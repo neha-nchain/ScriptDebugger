@@ -50,12 +50,17 @@ public class InteractiveScriptAppController implements Initializable {
     public Label remainingScriptLabel;
     @FXML
     public Label stackLabel;
+
     @FXML
     public Button debugBtn;
 
-
+    @FXML
+    public Button runBtn;
     @FXML
     public TextField tbScriptSig;
+
+    @FXML
+    public TextField tbScriptPub;
 
 
     @Override
@@ -64,7 +69,7 @@ public class InteractiveScriptAppController implements Initializable {
     }
 
     @FXML
-    private void debugScript(ActionEvent actionEvent) throws IOException {
+    private void runScript(ActionEvent actionEvent) throws IOException {
 
         Script script = null;
         Context.getInstance().getStackItemsList().clear();
@@ -73,6 +78,27 @@ public class InteractiveScriptAppController implements Initializable {
 
         // script = ScriptBuilder.createScriptFromUIInput(tbScriptSig.getText().split(" "));
         script = parseScriptString(tbScriptSig.getText().toUpperCase());
+        Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
+
+        script = parseScriptString(tbScriptPub.getText().toUpperCase());
+        Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
+
+        addStack(listener);
+
+    }
+    @FXML
+    private void debugScript(ActionEvent actionEvent) throws IOException {
+
+        Script script = null;
+        Context.getInstance().getStackItemsList().clear();
+        LinkedList<byte[]> stack = new LinkedList<byte[]>();
+        InteractiveScriptStateListener listener = new InteractiveScriptStateListener(false);
+
+        // script = ScriptBuilder.createScriptFromUIInput(tbScriptSig.getText().split(" "));
+        script = parseScriptString(tbScriptSig.getText().toUpperCase());
+        Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
+
+        script = parseScriptString(tbScriptPub.getText().toUpperCase());
         Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
 
         addStack(listener);
