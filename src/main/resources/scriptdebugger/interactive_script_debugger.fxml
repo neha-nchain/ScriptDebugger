@@ -72,13 +72,13 @@
             </Button>
         </GridPane>
     </left>
-<right>
+<center>
     <GridPane
             fx:id="gridPaneStack" hgap="10" vgap="10">
 
         <padding><Insets top="40" right="20" bottom="40" left="0"/></padding>
         <columnConstraints>
-            <ColumnConstraints minWidth="50" prefWidth="570"
+            <ColumnConstraints minWidth="50" prefWidth="300"
                                maxWidth="Infinity" halignment="LEFT">
             </ColumnConstraints>
         </columnConstraints>
@@ -96,14 +96,14 @@
             </GridPane.margin>
         </Label>
 
-        <ScrollPane fx:id="scrollPane" GridPane.columnIndex="0" prefHeight="500"
+        <ScrollPane fx:id="scrollPaneRun" GridPane.columnIndex="0" prefHeight="500" prefWidth="300"
                     GridPane.rowIndex="1" GridPane.columnSpan="1"
                     GridPane.rowSpan="1" GridPane.halignment="CENTER"></ScrollPane>
 
-      <ScrollPane fx:id="scrollPaneDebug" GridPane.columnIndex="1" prefHeight="500"
+      <ScrollPane fx:id="scrollPaneDebug" GridPane.columnIndex="1" prefHeight="500" prefWidth="300"
                     GridPane.rowIndex="1" GridPane.columnSpan="1"
-                    GridPane.rowSpan="2" GridPane.halignment="LEFT"></ScrollPane>
+                    GridPane.rowSpan="1" GridPane.halignment="CENTER"></ScrollPane>
 
     </GridPane>
-    </right>
+    </center>
 </BorderPane>
