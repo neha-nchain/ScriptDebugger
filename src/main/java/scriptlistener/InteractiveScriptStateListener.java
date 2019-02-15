@@ -16,15 +16,15 @@
 package scriptlistener;
 
 import com.google.common.io.BaseEncoding;
-import model.StackItem;
-import model.StackItems;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.script.*;
+import scriptdebugger.InteractiveScriptAppController;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,16 +38,18 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
     private static final String NEWLINE = System.getProperty("line.separator");
 
     private String fullScriptString;
-    private boolean pauseForUser = true;
+    private InteractiveScriptAppController controller;
+    private boolean debugMode = true;
     public static final BaseEncoding HEX = BaseEncoding.base16().lowerCase();
 
     public List<String> sb = new ArrayList<>();
 
-    public InteractiveScriptStateListener(boolean pauseForUser) {
-        this.pauseForUser = pauseForUser;
+    public InteractiveScriptStateListener(boolean debugMode, InteractiveScriptAppController controller) {
+        this.debugMode = debugMode;
+        this.controller = controller;
     }
-    StackItems stackItems = new StackItems();
-    List<StackItem> stackItemList = new ArrayList<StackItem>();
+
+    private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     @Override
     public void onBeforeOpCodeExecuted(boolean willExecute) {
@@ -130,10 +132,25 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
             sb.add(NEWLINE);
         }
 
-        if (pauseForUser) {
-            System.out.print("Press enter key to continue");
+        if (debugMode) {
+
+            try {
+                System.out.println();
+                System.out.println("-------Press 'Play' To Continue--------");
+                System.out.println();
+                controller.onHitBreakpoint();
+                countDownLatch.await();
+                countDownLatch = new CountDownLatch(1);
+            } catch(InterruptedException e){
+                e.printStackTrace();
+                System.exit(1);
+            }
         }
 
+    }
+
+    public void playToNextExecPoint() {
+        countDownLatch.countDown();
     }
 
     @Override

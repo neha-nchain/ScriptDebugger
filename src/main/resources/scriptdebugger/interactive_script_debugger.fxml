@@ -70,6 +70,18 @@
                     <Insets top="20" right="0" bottom="20" left="0"></Insets>
                 </GridPane.margin>
             </Button>
+
+            <!-- Add debug script Button -->
+            <Button fx:id="continueBtn" text="Play"
+                    prefWidth="170" prefHeight="20" defaultButton="true"
+                    GridPane.columnIndex="0" GridPane.rowIndex="4"
+                    GridPane.columnSpan="2" GridPane.rowSpan="1"
+                    GridPane.halignment="LEFT"
+                    onAction="#continueDebugging" visible="false">
+                <GridPane.margin>
+                    <Insets top="20" right="0" bottom="20" left="0"></Insets>
+                </GridPane.margin>
+            </Button>
         </GridPane>
     </left>
 <center>
