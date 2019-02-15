@@ -154,11 +154,12 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
             sb.add("Script success.");
             model.Context.getInstance().setScriptStatus(true);
         }
+        controller.debugBtn.setVisible(true);
+        controller.continueBtn.setVisible(false);
     }
 
     private String truncateData(String scriptString) {
         System.out.println("Lets scriptString " + scriptString);
-        //sb.add("Lets scriptString " + scriptString);
         Pattern p = Pattern.compile("\\[(.*?)\\]");
         Matcher m = p.matcher(scriptString);
 

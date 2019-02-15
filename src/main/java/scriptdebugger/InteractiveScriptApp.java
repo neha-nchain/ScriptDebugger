@@ -48,7 +48,7 @@ public class InteractiveScriptApp extends Application {
         interactiveScriptAppController = new InteractiveScriptAppController();
         FXMLLoader fxmlLoader= new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource("/scriptdebugger/interactive_script_debugger.fxml"));
-        fxmlLoader.setController(interactiveScriptAppController);
+       // fxmlLoader.setController(interactiveScriptAppController);
         borderPane = fxmlLoader.<BorderPane>load();
 
         primaryStage.setTitle(APP_NAME);
