@@ -128,8 +128,9 @@ public class InteractiveScriptAppController implements Initializable {
 
         Context.getInstance().getStackItemsList().clear();
         LinkedList<byte[]> stack = new LinkedList<byte[]>();
-        Script scriptSig = parseScriptString((tbScriptSig.getText().concat(" ").concat(tbScriptPub.getText())).toUpperCase());
-      //  Script scriptPub = parseScriptString(tbScriptPub.getText().toUpperCase());
+       // Script scriptSig = parseScriptString((tbScriptSig.getText().concat(" ").concat(tbScriptPub.getText())).toUpperCase());
+        Script scriptSig = parseScriptString(tbScriptSig.getText().toUpperCase());
+        Script scriptPub = parseScriptString(tbScriptPub.getText().toUpperCase());
         debugBtn.setVisible(false);
         continueBtn.setVisible(true);
 
@@ -137,8 +138,8 @@ public class InteractiveScriptAppController implements Initializable {
             Executors.newSingleThreadExecutor().submit(() -> {
                 Script.executeDebugScript(
                         new Transaction(MainNetParams.get()), 0, scriptSig, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
-                /*Script.executeDebugScript(
-                        new Transaction(MainNetParams.get()), 0, scriptPub, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);*/
+                Script.executeDebugScript(
+                        new Transaction(MainNetParams.get()), 0, scriptPub, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
             });
         }catch(Exception e){
             e.printStackTrace();
