@@ -1,16 +1,20 @@
 package scriptdebugger;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import model.Breakpoints;
 import model.Context;
+import model.StackItem;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
 import org.bitcoinj.core.UnsafeByteArrayOutputStream;
@@ -28,6 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.bitcoinj.core.Utils.HEX;
@@ -45,6 +51,9 @@ public class InteractiveScriptAppController implements Initializable {
     @FXML
     public Label remainingScriptLabel;
     @FXML
+    public Label scriptStatusLabel;
+
+    @FXML
     public Button debugBtn;
     @FXML
     public Button continueBtn;
@@ -57,27 +66,61 @@ public class InteractiveScriptAppController implements Initializable {
 
     private InteractiveScriptStateListener listener;
 
+    @FXML
+    private ListView<String> breakpointsListView;
+
+    private ObservableList<String> breakpointsObservableList;
+
+    private List<String> breakHere;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        listener = new InteractiveScriptStateListener(true, this);
         Context.getInstance().getStackItemsList();
+        breakpointsObservableList = FXCollections.observableArrayList();
+        breakpointsListView.setItems(breakpointsObservableList);
+        breakpointsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        breakpointsListView.setEditable(true);
+        debugBtn.setVisible(false);
+
     }
+
 
     @FXML
     private void runScript(ActionEvent actionEvent) throws IOException {
-
-        Script script;
         Context.getInstance().getStackItemsList().clear();
-        LinkedList<byte[]> stack = new LinkedList<byte[]>();
-        InteractiveScriptStateListener listener = new InteractiveScriptStateListener(false, this);
+        Context.getInstance().setScriptStatus(null);
 
-        script = parseScriptString(tbScriptSig.getText().toUpperCase());
-        Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
+    //    listener.getScriptChunks().subList(listener.getChunkIndex(), listener.getScriptChunks().size());
+        spiltIntoBreakpoints(tbScriptSig.getText(), tbScriptPub.getText());
+        createBreakpointView();
+        debugBtn.setVisible(true);
+        runBtn.setVisible(false);
+        // addStackRun(listener);
+      //  addListView();
+    }
 
-        script = parseScriptString(tbScriptPub.getText().toUpperCase());
-        Script.executeDebugScript(new Transaction(MainNetParams.get()), 0, script, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
+    private void spiltIntoBreakpoints(String tbScriptSig, String tbScriptPub) {
+        breakpointsListView.getItems().clear();
+        String finalScript = Stream.of(tbScriptSig,tbScriptPub)
+                .filter(s -> s != null && !s.isEmpty())
+                .collect(Collectors.joining(" "));
 
-        addStackRun(listener);
+        addtoListOfTokens(finalScript);
+        //  addtoListOfTokens(tbScriptPub);
+
+    }
+
+    private void addtoListOfTokens(String tbScript) {
+        if (!tbScript.isEmpty()) {
+            String[] scriptSigBreakPoint = (tbScript.trim()).split("\\s+");
+            for (String tokens : scriptSigBreakPoint) {
+                Breakpoints token = new Breakpoints(new SimpleStringProperty(tokens));
+                breakpointsObservableList.add(token.getBreakpoints());
+            }
+
+        }
     }
 
     @FXML
@@ -85,24 +128,43 @@ public class InteractiveScriptAppController implements Initializable {
 
         Context.getInstance().getStackItemsList().clear();
         LinkedList<byte[]> stack = new LinkedList<byte[]>();
-        listener = new InteractiveScriptStateListener(true, this);
-
-        Script scriptSig = parseScriptString(tbScriptSig.getText().toUpperCase());
-        Script scriptPub = parseScriptString(tbScriptPub.getText().toUpperCase());
+        Script scriptSig = parseScriptString((tbScriptSig.getText().concat(" ").concat(tbScriptPub.getText())).toUpperCase());
+      //  Script scriptPub = parseScriptString(tbScriptPub.getText().toUpperCase());
         debugBtn.setVisible(false);
         continueBtn.setVisible(true);
-        Executors.newSingleThreadExecutor().submit(()-> {
 
-            Script.executeDebugScript(
-                    new Transaction(MainNetParams.get()), 0, scriptSig, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
-            Script.executeDebugScript(
-                    new Transaction(MainNetParams.get()), 0, scriptPub, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
-        });
+        try {
+            Executors.newSingleThreadExecutor().submit(() -> {
+                Script.executeDebugScript(
+                        new Transaction(MainNetParams.get()), 0, scriptSig, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);
+                /*Script.executeDebugScript(
+                        new Transaction(MainNetParams.get()), 0, scriptPub, stack, Coin.ZERO, Script.ALL_VERIFY_FLAGS, listener);*/
+            });
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void createBreakpointView() {
+         scrollPaneRun.setContent(breakpointsListView);
+    }
+
+    public void isBreakpoint() {
+        try {
+            onHitBreakpoint();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void onHitBreakpoint() {
         Platform.runLater(()->{
-            addStackDebug(listener);});
+            addStackDebug(listener,false);});
+    }
+
+    public void onScriptComplete() {
+        Platform.runLater(()->{
+            addStackDebug(listener, true);});
     }
 
     @FXML
@@ -110,34 +172,30 @@ public class InteractiveScriptAppController implements Initializable {
         listener.playToNextExecPoint();
     }
 
-    //Display the stack in run UI
-    public void addStackRun(InteractiveScriptStateListener listener) {
-
-        GridPane gridPane = new GridPane();
-        int stacksize = 0;
-        gridPane.setId("grid_pane" + stacksize);
-
-        List<String> lines = listener.sb;
-        for (int i = 0; i < lines.size(); i++) {
-            createLabel(i, lines.get(i), false, gridPane);
-        }
-
-        scrollPaneRun.setContent(gridPane);
-    }
-
     //Display the stack in debug UI
-    public void addStackDebug(InteractiveScriptStateListener listener) {
+    public void addStackDebug(InteractiveScriptStateListener listener, boolean over ) {
 
         GridPane gridPane = new GridPane();
         int stacksize = 0;
         gridPane.setId("grid_pane_debug" + stacksize);
 
-        List<String> lines = listener.sb;
-        for (int i = 0; i < lines.size(); i++) {
-            createLabel(i, lines.get(i), false, gridPane);
+       ///// adding back context
+        for (StackItem stackItem : Context.getInstance().getStackItemsList()) {
+                if (stackItem.getRemainingScript() != null) {
+                    createLabel(stacksize, "Execution point:  " + stackItem.getRemainingScript(), true, gridPane);
+                    stacksize = stacksize + 1;
+                }
+                createLabel(stacksize, "index[" + stackItem.getIndex() + "] " + Utils.HEX.encode(stackItem.getData()).toString(), false, gridPane);
+                stacksize = stacksize + 1;
+            }
+
+        if(over) {
+            createStatusLabel(stacksize, "Script status: " + Context.getInstance().getScriptStatus(), true, gridPane);
         }
+        //////////////////
         scrollPaneDebug.setContent(gridPane);
     }
+
 
     private void createLabel(int stacksize, String data, boolean style, GridPane gridPane) {
         remainingScriptLabel = new Label();
@@ -148,7 +206,14 @@ public class InteractiveScriptAppController implements Initializable {
         }
         gridPane.add(remainingScriptLabel, 0, stacksize);
     }
+    private void createStatusLabel(int stacksize, String data, boolean style, GridPane gridPane) {
+        scriptStatusLabel = new Label();
+        scriptStatusLabel.setId("stack_" + (stacksize + 1));
+        scriptStatusLabel.setText(data);
+        scriptStatusLabel.setStyle("-fx-font-weight:bold");
 
+        gridPane.add(scriptStatusLabel, 0, stacksize);
+    }
     private Script parseScriptString(String string) throws IOException {
         String[] words = string.split("[ \\t\\n]");
 

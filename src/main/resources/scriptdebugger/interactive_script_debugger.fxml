@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
@@ -8,7 +8,9 @@
     <left>
         <GridPane fx:id="gridPane" hgap="10" vgap="10">
 
-            <padding><Insets top="40" right="10" bottom="40" left="20"/></padding>
+            <padding>
+                <Insets top="40" right="10" bottom="40" left="20"/>
+            </padding>
             <columnConstraints>
                 <ColumnConstraints minWidth="50" prefWidth="50"
                                    maxWidth="Infinity" halignment="LEFT">
@@ -21,9 +23,9 @@
             <!-- Add Header Label -->
             <Label text="Script Inputs" GridPane.columnIndex="0"
                    GridPane.rowIndex="0" GridPane.columnSpan="2"
-                   GridPane.rowSpan="1" GridPane.halignment="LEFT"  style="-fx-text-fill: blue">
+                   GridPane.rowSpan="1" GridPane.halignment="LEFT" style="-fx-text-fill: blue">
                 <font>
-                    <Font name="System" size="24" ></Font>
+                    <Font name="System" size="24"></Font>
                 </font>
                 <GridPane.margin>
                     <Insets top="20" right="0" bottom="20" left="0"></Insets>
@@ -33,7 +35,7 @@
 
             <!-- Add script sig Label -->
             <Label text="Script Sig Key: " GridPane.columnIndex="0"
-                   GridPane.rowIndex="1" >
+                   GridPane.rowIndex="1">
             </Label>
             <!-- Add Name Text Field -->
             <TextField fx:id="tbScriptSig" prefHeight="40"
@@ -41,7 +43,7 @@
 
             <!-- Add script sig Label -->
             <Label text="Script Pub Key: " GridPane.columnIndex="0"
-                   GridPane.rowIndex="2" >
+                   GridPane.rowIndex="2">
             </Label>
             <!-- Add Name Text Field -->
             <TextField fx:id="tbScriptPub" prefHeight="40"
@@ -84,38 +86,48 @@
             </Button>
         </GridPane>
     </left>
-<center>
-    <GridPane
-            fx:id="gridPaneStack" hgap="10" vgap="10">
+    <center>
+        <GridPane
+                fx:id="gridPaneStack" hgap="10" vgap="10">
 
-        <padding><Insets top="40" right="20" bottom="40" left="0"/></padding>
-        <columnConstraints>
-            <ColumnConstraints minWidth="50" prefWidth="300"
-                               maxWidth="Infinity" halignment="LEFT">
-            </ColumnConstraints>
-        </columnConstraints>
+            <padding>
+                <Insets top="40" right="20" bottom="40" left="0"/>
+            </padding>
+            <columnConstraints>
+                <ColumnConstraints minWidth="50" prefWidth="300"
+                                   maxWidth="Infinity" halignment="LEFT">
+                </ColumnConstraints>
+            </columnConstraints>
 
 
-      <!-- Add Header Label -->
-        <Label text="Script Stack" GridPane.columnIndex="0"
-               GridPane.rowIndex="0" GridPane.columnSpan="1"
-               GridPane.rowSpan="1" GridPane.halignment="LEFT"  style="-fx-text-fill: blue">
-            <font>
-                <Font name="System" size="24" ></Font>
-            </font>
-            <GridPane.margin>
-                <Insets top="20" right="0" bottom="0" left="0"></Insets>
-            </GridPane.margin>
-        </Label>
+            <!-- Add Header Label -->
+            <Label text="Script Stack" GridPane.columnIndex="0"
+                   GridPane.rowIndex="0" GridPane.columnSpan="1"
+                   GridPane.rowSpan="1" GridPane.halignment="LEFT" style="-fx-text-fill: blue">
+                <font>
+                    <Font name="System" size="24"></Font>
+                </font>
+                <GridPane.margin>
+                    <Insets top="20" right="0" bottom="0" left="0"></Insets>
+                </GridPane.margin>
+            </Label>
 
-        <ScrollPane fx:id="scrollPaneRun" GridPane.columnIndex="0" prefHeight="500" prefWidth="300"
-                    GridPane.rowIndex="1" GridPane.columnSpan="1"
-                    GridPane.rowSpan="1" GridPane.halignment="CENTER"></ScrollPane>
+            <ScrollPane fx:id="scrollPaneRun" GridPane.columnIndex="0" prefHeight="500" prefWidth="300"
+                        GridPane.rowIndex="1" GridPane.columnSpan="1"
+                        GridPane.rowSpan="1" GridPane.halignment="CENTER">
 
-      <ScrollPane fx:id="scrollPaneDebug" GridPane.columnIndex="1" prefHeight="500" prefWidth="300"
-                    GridPane.rowIndex="1" GridPane.columnSpan="1"
-                    GridPane.rowSpan="1" GridPane.halignment="CENTER"></ScrollPane>
+                <ListView fx:id="breakpointsListView" layoutX="26.0" layoutY="86.0" prefHeight="500"
+                          prefWidth="300"/>
 
-    </GridPane>
+            </ScrollPane>
+
+            <ScrollPane fx:id="scrollPaneDebug" GridPane.columnIndex="1" prefHeight="500" prefWidth="300"
+                        GridPane.rowIndex="1" GridPane.columnSpan="1"
+                        GridPane.rowSpan="1" GridPane.halignment="CENTER">
+
+            </ScrollPane>
+
+
+        </GridPane>
     </center>
 </BorderPane>

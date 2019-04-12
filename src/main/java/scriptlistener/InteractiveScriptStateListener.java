@@ -16,6 +16,8 @@
 package scriptlistener;
 
 import com.google.common.io.BaseEncoding;
+import model.Context;
+import model.StackItem;
 import org.bitcoinj.core.ScriptException;
 import org.bitcoinj.core.Utils;
 import org.bitcoinj.script.*;
@@ -24,6 +26,7 @@ import scriptdebugger.InteractiveScriptAppController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,7 +42,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
 
     private String fullScriptString;
     private InteractiveScriptAppController controller;
-    private boolean debugMode = true;
+    private boolean debugMode;
     public static final BaseEncoding HEX = BaseEncoding.base16().lowerCase();
 
     public List<String> sb = new ArrayList<>();
@@ -90,16 +93,15 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
                 stack = stack + " " + (index++) + " " + bytes + "\n";
 
                 //print the HEX to debugger
+                System.out.println("Utils.HEX.encode(bytes) -- >   " + Utils.HEX.encode(bytes));
                sb.add(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, Utils.HEX.encode(bytes)));
-               /* StackItem stackItem;
+                StackItem stackItem;
                 if(index==1) {
                     stackItem = new StackItem(index, bytes, remainingString);
                 }else{
                     stackItem = new StackItem(index, bytes);
                 }
-              //  stackItemList.add(stackItem);
-              //  stackItems.setStackItems(stackItemList);
-                model.Context.getInstance().getStackItemsList().add(stackItem);*/
+                model.Context.getInstance().getStackItemsList().add(stackItem);
 
             }
         }
@@ -131,17 +133,17 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
             System.out.println();
             sb.add(NEWLINE);
         }
-
         if (debugMode) {
 
             try {
-                System.out.println();
                 System.out.println("-------Press 'Play' To Continue--------");
-                System.out.println();
-                controller.onHitBreakpoint();
+                controller.isBreakpoint();
+               // System.out.println("wait ");
                 countDownLatch.await();
+             //   System.out.println("is wait ");
                 countDownLatch = new CountDownLatch(1);
-            } catch(InterruptedException e){
+             //   System.out.println("countdown ");
+            } catch(Exception e){
                 e.printStackTrace();
                 System.exit(1);
             }
@@ -150,7 +152,11 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
     }
 
     public void playToNextExecPoint() {
+
+     //   System.out.println("countdown call 1 ");
         countDownLatch.countDown();
+
+     //   System.out.println("countdown call 2");
     }
 
     @Override
@@ -162,17 +168,23 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
     @Override
     public void onScriptComplete() {
         List<byte[]> stack = getStack();
-        if (stack.isEmpty() || !Script.castToBool(stack.get(stack.size() - 1))) {
+       if (stack.isEmpty() || !Script.castToBool(stack.get(stack.size() - 1))) {
             System.out.println("Script failed.");
-            sb.add("Script failed.");
-            model.Context.getInstance().setScriptStatus(false);
+            model.Context.getInstance().setScriptStatus("Failed");
+          //  controller.onScriptComplete();
         } else {
             System.out.println("Script success.");
-            sb.add("Script success.");
-            model.Context.getInstance().setScriptStatus(true);
+            model.Context.getInstance().setScriptStatus("Success");
+         //   controller.onScriptComplete();
         }
-        controller.debugBtn.setVisible(true);
-        controller.continueBtn.setVisible(false);
+
+        if(debugMode) {
+
+            controller.runBtn.setVisible(true);
+            controller.debugBtn.setVisible(false);
+            controller.continueBtn.setVisible(false);
+       }
+
     }
 
     private String truncateData(String scriptString) {

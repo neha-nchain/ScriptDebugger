@@ -6,16 +6,16 @@ import java.util.List;
 public class Context {
 
     private final static Context instance = new Context();
+    private String scriptStatus;
 
-    public boolean isScriptStatus() {
+    public String getScriptStatus() {
         return scriptStatus;
     }
 
-    public void setScriptStatus(boolean scriptStatus) {
+    public void setScriptStatus(String scriptStatus) {
         this.scriptStatus = scriptStatus;
     }
 
-    private boolean scriptStatus;
     private List<StackItem> stackItemsList = new ArrayList<StackItem>();
     public static Context getInstance() {
         return instance;
