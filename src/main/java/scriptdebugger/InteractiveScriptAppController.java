@@ -73,6 +73,8 @@ public class InteractiveScriptAppController implements Initializable {
 
     private List<String> breakHere;
 
+    public int scriptCounter;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -91,6 +93,7 @@ public class InteractiveScriptAppController implements Initializable {
     private void runScript(ActionEvent actionEvent) throws IOException {
         Context.getInstance().getStackItemsList().clear();
         Context.getInstance().setScriptStatus(null);
+        scriptCounter=0;
 
     //    listener.getScriptChunks().subList(listener.getChunkIndex(), listener.getScriptChunks().size());
         spiltIntoBreakpoints(tbScriptSig.getText(), tbScriptPub.getText());

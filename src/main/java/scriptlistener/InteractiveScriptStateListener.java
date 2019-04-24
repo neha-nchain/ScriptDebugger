@@ -168,17 +168,18 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
     @Override
     public void onScriptComplete() {
         List<byte[]> stack = getStack();
+        controller.scriptCounter++;
        if (stack.isEmpty() || !Script.castToBool(stack.get(stack.size() - 1))) {
             System.out.println("Script failed.");
             model.Context.getInstance().setScriptStatus("Failed");
-          //  controller.onScriptComplete();
+           controller.onScriptComplete();
         } else {
             System.out.println("Script success.");
             model.Context.getInstance().setScriptStatus("Success");
-         //   controller.onScriptComplete();
+            controller.onScriptComplete();
         }
 
-        if(debugMode) {
+        if(debugMode && controller.scriptCounter==2) {
 
             controller.runBtn.setVisible(true);
             controller.debugBtn.setVisible(false);
