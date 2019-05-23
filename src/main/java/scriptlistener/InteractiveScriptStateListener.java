@@ -31,11 +31,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * A simple demonstration of ScriptStateListener that dumps the state of the script interpreter to console after each op code execution.
- * <p>
- * Created by shadders on 7/02/18.
- */
 public class InteractiveScriptStateListener extends ScriptStateListener {
 
     private static final String NEWLINE = System.getProperty("line.separator");
@@ -52,7 +47,6 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         this.controller = controller;
     }
 
-    private CountDownLatch countDownLatch = new CountDownLatch(1);
 
     @Override
     public void onBeforeOpCodeExecuted(boolean willExecute) {
@@ -62,7 +56,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
         }
 
         System.out.println(String.format("\nExecuting %s operation: [%s]", getCurrentChunk().isOpCode() ? "OP_CODE" : "PUSHDATA", ScriptOpCodes.getOpCodeName(getCurrentChunk().opcode)));
-       // sb.add(String.format("\nExecuting %s operation: [%s]", getCurrentChunk().isOpCode() ? "OP_CODE" : "PUSHDATA", ScriptOpCodes.getOpCodeName(getCurrentChunk().opcode)));
+        // sb.add(String.format("\nExecuting %s operation: [%s]", getCurrentChunk().isOpCode() ? "OP_CODE" : "PUSHDATA", ScriptOpCodes.getOpCodeName(getCurrentChunk().opcode)));
     }
 
     @Override
@@ -94,11 +88,11 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
 
                 //print the HEX to debugger
                 System.out.println("Utils.HEX.encode(bytes) -- >   " + Utils.HEX.encode(bytes));
-               sb.add(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, Utils.HEX.encode(bytes)));
+                sb.add(String.format("StackItem index[%s] length[%s] [%s]", index, bytes.length, Utils.HEX.encode(bytes)));
                 StackItem stackItem;
-                if(index==1) {
+                if (index == 1) {
                     stackItem = new StackItem(index, bytes, remainingString);
-                }else{
+                } else {
                     stackItem = new StackItem(index, bytes);
                 }
                 model.Context.getInstance().getStackItemsList().add(stackItem);
@@ -117,7 +111,7 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
                 System.out.println(HEX.encode(bytes));
                 sb.add(HEX.encode(bytes));
             }
-           sb.add(NEWLINE);
+            sb.add(NEWLINE);
         }
 
         if (!getIfStack().isEmpty()) {
@@ -138,12 +132,9 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
             try {
                 System.out.println("-------Press 'Play' To Continue--------");
                 controller.isBreakpoint();
-               // System.out.println("wait ");
-                countDownLatch.await();
-             //   System.out.println("is wait ");
-                countDownLatch = new CountDownLatch(1);
-             //   System.out.println("countdown ");
-            } catch(Exception e){
+                controller.countDownLatch.await();
+               controller.countDownLatch = new CountDownLatch(1);
+            } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
             }
@@ -153,10 +144,10 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
 
     public void playToNextExecPoint() {
 
-     //   System.out.println("countdown call 1 ");
-        countDownLatch.countDown();
+        //   System.out.println("countdown call 1 ");
+        controller.countDownLatch.countDown();
 
-     //   System.out.println("countdown call 2");
+        //   System.out.println("countdown call 2");
     }
 
     @Override
@@ -169,22 +160,22 @@ public class InteractiveScriptStateListener extends ScriptStateListener {
     public void onScriptComplete() {
         List<byte[]> stack = getStack();
         controller.scriptCounter++;
-       if (stack.isEmpty() || !Script.castToBool(stack.get(stack.size() - 1))) {
+        if (stack.isEmpty() || !Script.castToBool(stack.get(stack.size() - 1))) {
             System.out.println("Script failed.");
             model.Context.getInstance().setScriptStatus("Failed");
-           controller.onScriptComplete();
+            controller.onScriptComplete();
         } else {
             System.out.println("Script success.");
             model.Context.getInstance().setScriptStatus("Success");
             controller.onScriptComplete();
         }
 
-        if(debugMode && controller.scriptCounter==2) {
+        if (debugMode && controller.scriptCounter == 2) {
 
             controller.runBtn.setVisible(true);
             controller.debugBtn.setVisible(false);
             controller.continueBtn.setVisible(false);
-       }
+        }
 
     }
 

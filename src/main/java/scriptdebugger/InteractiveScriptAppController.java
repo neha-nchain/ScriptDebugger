@@ -5,11 +5,13 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import model.Breakpoints;
@@ -31,6 +33,7 @@ import java.nio.charset.Charset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -66,12 +69,18 @@ public class InteractiveScriptAppController implements Initializable {
 
     private InteractiveScriptStateListener listener;
 
+    public CountDownLatch countDownLatch = new CountDownLatch(1);
+
     @FXML
     private ListView<String> breakpointsListView;
 
     private ObservableList<String> breakpointsObservableList;
 
     private List<String> breakHere;
+
+    private int scriptSignLength;
+
+    private boolean isEdited;
 
     public int scriptCounter;
 
@@ -80,38 +89,69 @@ public class InteractiveScriptAppController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         listener = new InteractiveScriptStateListener(true, this);
         Context.getInstance().getStackItemsList();
+        debugBtn.setVisible(false);
         breakpointsObservableList = FXCollections.observableArrayList();
         breakpointsListView.setItems(breakpointsObservableList);
         breakpointsListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         breakpointsListView.setEditable(true);
-        debugBtn.setVisible(false);
+        breakpointsListView.setCellFactory(TextFieldListCell.forListView());
 
+        breakpointsListView.setOnEditCommit(new EventHandler<ListView.EditEvent<String>>() {
+            @Override
+            public void handle(ListView.EditEvent<String> t) {
+                System.out.println("Event setOnEditCommit"+ breakpointsListView.getItems());
+                breakpointsListView.getItems().set(t.getIndex(), t.getNewValue());
+                breakpointsListView.edit(t.getIndex());
+                clearStackUI();
+                debugBtn.setVisible(true);
+                runBtn.setVisible(false);
+                continueBtn.setVisible(false);
+                try {
+                   // countDownLatch.await();
+                    countDownLatch = new CountDownLatch(1);
+                } catch (Exception e) {
+                    System.out.println("Event setOnEditCommit interrupted "+ e.getMessage());
+                    System.exit(1);
+                }
+
+            }
+
+        });
+
+        breakpointsListView.setOnEditCancel(new EventHandler<ListView.EditEvent<String>>() {
+            @Override
+            public void handle(ListView.EditEvent<String> t) {
+                breakpointsListView.edit(t.getIndex());
+                System.out.println("setOnEditCancel");
+            }
+        });
     }
-
 
     @FXML
     private void runScript(ActionEvent actionEvent) throws IOException {
-        Context.getInstance().getStackItemsList().clear();
-        Context.getInstance().setScriptStatus(null);
-        scriptCounter=0;
-
-    //    listener.getScriptChunks().subList(listener.getChunkIndex(), listener.getScriptChunks().size());
+        clearStackUI();
         spiltIntoBreakpoints(tbScriptSig.getText(), tbScriptPub.getText());
         createBreakpointView();
         debugBtn.setVisible(true);
         runBtn.setVisible(false);
-        // addStackRun(listener);
-      //  addListView();
+
+    }
+
+    private void clearStackUI(){
+        Context.getInstance().getStackItemsList().clear();
+        Context.getInstance().setScriptStatus(null);
+        scriptCounter=0;// Used in InteractiveScriptStateListener class
     }
 
     private void spiltIntoBreakpoints(String tbScriptSig, String tbScriptPub) {
         breakpointsListView.getItems().clear();
+        scriptSignLength = tbScriptSig.split(" ").length;
         String finalScript = Stream.of(tbScriptSig,tbScriptPub)
                 .filter(s -> s != null && !s.isEmpty())
                 .collect(Collectors.joining(" "));
 
         addtoListOfTokens(finalScript);
-        //  addtoListOfTokens(tbScriptPub);
+
 
     }
 
@@ -131,9 +171,9 @@ public class InteractiveScriptAppController implements Initializable {
 
         Context.getInstance().getStackItemsList().clear();
         LinkedList<byte[]> stack = new LinkedList<byte[]>();
-       // Script scriptSig = parseScriptString((tbScriptSig.getText().concat(" ").concat(tbScriptPub.getText())).toUpperCase());
-        Script scriptSig = parseScriptString(tbScriptSig.getText().toUpperCase());
-        Script scriptPub = parseScriptString(tbScriptPub.getText().toUpperCase());
+        Script scriptSig = parseScriptString(String.join(" ",breakpointsListView.getItems().subList(0,scriptSignLength)).toUpperCase());
+        Script scriptPub = parseScriptString(String.join(" ",breakpointsListView.getItems().subList(scriptSignLength, breakpointsListView.getItems().size())).toUpperCase());
+
         debugBtn.setVisible(false);
         continueBtn.setVisible(true);
 

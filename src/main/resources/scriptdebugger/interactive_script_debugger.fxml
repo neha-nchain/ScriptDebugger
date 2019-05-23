@@ -12,10 +12,10 @@
                 <Insets top="40" right="10" bottom="40" left="20"/>
             </padding>
             <columnConstraints>
-                <ColumnConstraints minWidth="50" prefWidth="50"
+                <ColumnConstraints minWidth="100" prefWidth="50"
                                    maxWidth="Infinity" halignment="LEFT">
                 </ColumnConstraints>
-                <ColumnConstraints minWidth="50" prefWidth="100"
+                <ColumnConstraints minWidth="100" prefWidth="100"
                                    maxWidth="Infinity" hgrow="ALWAYS">
                 </ColumnConstraints>
             </columnConstraints>
@@ -101,7 +101,7 @@
 
 
             <!-- Add Header Label -->
-            <Label text="Script Stack" GridPane.columnIndex="0"
+            <Label text="Script Chunks" GridPane.columnIndex="0"
                    GridPane.rowIndex="0" GridPane.columnSpan="1"
                    GridPane.rowSpan="1" GridPane.halignment="LEFT" style="-fx-text-fill: blue">
                 <font>
@@ -120,7 +120,17 @@
                           prefWidth="300"/>
 
             </ScrollPane>
-
+            <!-- Add Header Label -->
+            <Label text="Script Stack" GridPane.columnIndex="1"
+                   GridPane.rowIndex="0" GridPane.columnSpan="1"
+                   GridPane.rowSpan="1" GridPane.halignment="LEFT" style="-fx-text-fill: blue">
+                <font>
+                    <Font name="System" size="24"></Font>
+                </font>
+                <GridPane.margin>
+                    <Insets top="20" right="0" bottom="0" left="0"></Insets>
+                </GridPane.margin>
+            </Label>
             <ScrollPane fx:id="scrollPaneDebug" GridPane.columnIndex="1" prefHeight="500" prefWidth="300"
                         GridPane.rowIndex="1" GridPane.columnSpan="1"
                         GridPane.rowSpan="1" GridPane.halignment="CENTER">
